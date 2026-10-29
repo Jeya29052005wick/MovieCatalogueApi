@@ -55,4 +55,20 @@ public class MoviesController : ControllerBase
 
         return Ok(movie);
     }
+
+
+    // POST: api/movies
+    [HttpPost]
+    public async Task<ActionResult<Movie>> CreateMovie(Movie movie)
+    {
+        _context.Movies.Add(movie);
+
+        await _context.SaveChangesAsync();
+
+        return CreatedAtAction(
+            nameof(GetMovieById),
+            new { id = movie.Id },
+            movie);
+    }
+
 }
