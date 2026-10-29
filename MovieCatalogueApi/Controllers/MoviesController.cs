@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MovieCatalogueApi.Data;
 using MovieCatalogueApi.Models;
+using MovieCatalogueApi.Validators;
 
 namespace MovieCatalogueApi.Controllers;
 
@@ -15,6 +16,16 @@ public class MoviesController : ControllerBase
     public MoviesController(ApplicationDbContext context)
     {
         _context = context;
+    }
+
+    private readonly MovieRequestValidator _validator;
+
+    public MoviesController(
+        ApplicationDbContext context,
+        MovieRequestValidator validator)
+    {
+        _context = context;
+        _validator = validator;
     }
 
     // GET: api/movies
@@ -57,10 +68,27 @@ public class MoviesController : ControllerBase
     }
 
 
+
     // POST: api/movies
     [HttpPost]
-    public async Task<ActionResult<Movie>> CreateMovie(Movie movie)
+    public async Task<ActionResult<Movie>> CreateMovie(MovieRequest request)
     {
+        var errors = _validator.Validate(request);
+
+        if (errors.Count > 0)
+        {
+            return BadRequest(errors);
+        }
+
+        var movie = new Movie
+        {
+            Title = request.Title,
+            Genre = request.Genre,
+            Language = request.Language,
+            DurationMinutes = request.DurationMinutes,
+            ReleaseYear = request.ReleaseYear
+        };
+
         _context.Movies.Add(movie);
 
         await _context.SaveChangesAsync();
@@ -70,6 +98,7 @@ public class MoviesController : ControllerBase
             new { id = movie.Id },
             movie);
     }
+
 
 
     // PUT: api/movies/5

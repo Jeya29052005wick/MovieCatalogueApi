@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using MovieCatalogueApi.Data;
+using MovieCatalogueApi.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddOpenApi();
+
+builder.Services.AddScoped<MovieRequestValidator>();
 
 var app = builder.Build();
 
