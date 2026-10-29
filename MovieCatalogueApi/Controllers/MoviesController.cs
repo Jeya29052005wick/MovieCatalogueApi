@@ -28,7 +28,8 @@ public class MoviesController : ControllerBase
         _validator = validator;
     }
 
-    // GET: api/movies
+
+    // GET: api/movies?search=leo&genre=Action
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Movie>>> GetMovies(
         [FromQuery] string? search,
@@ -38,18 +39,24 @@ public class MoviesController : ControllerBase
 
         if (!string.IsNullOrWhiteSpace(search))
         {
-            query = query.Where(m => m.Title.Contains(search));
+            var searchTerm = search.Trim();
+
+            query = query.Where(m =>
+                m.Title.ToLower().Contains(searchTerm.ToLower()));
         }
 
         if (!string.IsNullOrWhiteSpace(genre))
         {
-            query = query.Where(m => m.Genre == genre);
+            var genreFilter = genre.Trim();
+
+            query = query.Where(m => m.Genre == genreFilter);
         }
 
         var movies = await query.ToListAsync();
 
         return Ok(movies);
     }
+
 
     // GET: api/movies/5
     [HttpGet("{id:int}")]
