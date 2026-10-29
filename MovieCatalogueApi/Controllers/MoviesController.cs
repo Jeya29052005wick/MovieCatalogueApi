@@ -100,4 +100,24 @@ public class MoviesController : ControllerBase
     }
 
 
+
+    // DELETE: api/movies/5
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> DeleteMovie(int id)
+    {
+        var movie = await _context.Movies.FindAsync(id);
+
+        if (movie is null)
+        {
+            return NotFound();
+        }
+
+        _context.Movies.Remove(movie);
+
+        await _context.SaveChangesAsync();
+
+        return NoContent();
+    }
+
+
 }
