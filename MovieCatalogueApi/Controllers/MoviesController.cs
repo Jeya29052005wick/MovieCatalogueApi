@@ -71,4 +71,33 @@ public class MoviesController : ControllerBase
             movie);
     }
 
+
+    // PUT: api/movies/5
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> UpdateMovie(int id, Movie updatedMovie)
+    {
+        if (id != updatedMovie.Id)
+        {
+            return BadRequest("The URL ID does not match the movie ID.");
+        }
+
+        var existingMovie = await _context.Movies.FindAsync(id);
+
+        if (existingMovie is null)
+        {
+            return NotFound();
+        }
+
+        existingMovie.Title = updatedMovie.Title;
+        existingMovie.Genre = updatedMovie.Genre;
+        existingMovie.Language = updatedMovie.Language;
+        existingMovie.DurationMinutes = updatedMovie.DurationMinutes;
+        existingMovie.ReleaseYear = updatedMovie.ReleaseYear;
+
+        await _context.SaveChangesAsync();
+
+        return NoContent();
+    }
+
+
 }
