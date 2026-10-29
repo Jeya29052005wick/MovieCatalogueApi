@@ -103,11 +103,15 @@ public class MoviesController : ControllerBase
 
     // PUT: api/movies/5
     [HttpPut("{id:int}")]
-    public async Task<IActionResult> UpdateMovie(int id, Movie updatedMovie)
+    public async Task<IActionResult> UpdateMovie(
+        int id,
+        MovieRequest request)
     {
-        if (id != updatedMovie.Id)
+        var errors = _validator.Validate(request);
+
+        if (errors.Count > 0)
         {
-            return BadRequest("The URL ID does not match the movie ID.");
+            return BadRequest(errors);
         }
 
         var existingMovie = await _context.Movies.FindAsync(id);
@@ -117,16 +121,17 @@ public class MoviesController : ControllerBase
             return NotFound();
         }
 
-        existingMovie.Title = updatedMovie.Title;
-        existingMovie.Genre = updatedMovie.Genre;
-        existingMovie.Language = updatedMovie.Language;
-        existingMovie.DurationMinutes = updatedMovie.DurationMinutes;
-        existingMovie.ReleaseYear = updatedMovie.ReleaseYear;
+        existingMovie.Title = request.Title;
+        existingMovie.Genre = request.Genre;
+        existingMovie.Language = request.Language;
+        existingMovie.DurationMinutes = request.DurationMinutes;
+        existingMovie.ReleaseYear = request.ReleaseYear;
 
         await _context.SaveChangesAsync();
 
         return NoContent();
     }
+
 
 
 
